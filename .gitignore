@@ -1,0 +1,42 @@
+# ═══ Java / Maven ═══
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+hs_err_pid*
+
+# ═══ IDE ═══
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/settings.json
+.project
+.classpath
+.settings/
+bin/
+
+# ═══ Node / Frontend ═══
+linguarise-frontend/node_modules/
+linguarise-frontend/dist/
+linguarise-frontend/.env.local
+
+# ═══ Docker ═══
+docker-data/
+
+# ═══ Environment ═══
+.env
+.env.local
+.env.production
+
+# ═══ OS ═══
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ═══ Test ═══
+*.exec

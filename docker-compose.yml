@@ -1,0 +1,104 @@
+version: '3.9'
+
+services:
+  # ═══ PostgreSQL (Main Database) ═══
+  postgresql:
+    image: postgres:16-alpine
+    container_name: linguarise-postgresql
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_DB: linguarise
+      POSTGRES_USER: linguarise
+      POSTGRES_PASSWORD: linguarise_dev_2026
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U linguarise"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - linguarise-network
+
+  # ═══ MongoDB (Content Database) ═══
+  mongodb:
+    image: mongo:7
+    container_name: linguarise-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - linguarise-network
+
+  # ═══ Redis (Cache & Session) ═══
+  redis:
+    image: redis:7-alpine
+    container_name: linguarise-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - linguarise-network
+
+  # ═══ Keycloak Database ═══
+  keycloak-db:
+    image: postgres:16-alpine
+    container_name: linguarise-keycloak-db
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak_dev_2026
+    volumes:
+      - kc_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - linguarise-network
+
+  # ═══ Keycloak (Identity Management) ═══
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: linguarise-keycloak
+    ports:
+      - "8180:8080"
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak_dev_2026
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin_dev_2026
+      KC_HEALTH_ENABLED: true
+    command: start-dev
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    networks:
+      - linguarise-network
+
+volumes:
+  pg_data:
+    name: linguarise-pg-data
+  mongo_data:
+    name: linguarise-mongo-data
+  kc_pg_data:
+    name: linguarise-kc-pg-data
+
+networks:
+  linguarise-network:
+    name: linguarise-network
+    driver: bridge

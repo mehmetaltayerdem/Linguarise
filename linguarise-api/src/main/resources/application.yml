@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: linguarise-api
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+# ═══ Server ═══
+server:
+  port: ${APP_PORT:8080}
+
+# ═══ Actuator ═══
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# ═══ Swagger ═══
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+# ═══ JWT Auth Converter ═══
+jwt:
+  auth:
+    converter:
+      resource-id: linguarise-api
+
+# ═══ Logging ═══
+logging:
+  level:
+    com.linguarise: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

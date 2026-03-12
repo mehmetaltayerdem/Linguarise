@@ -1,0 +1,28 @@
+# ═══ Test Profile ═══
+# Testcontainers will override DB URLs automatically
+
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16:///linguarise_test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  flyway:
+    enabled: true
+
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://localhost:27017/linguarise_test}
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/linguarise
